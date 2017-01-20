@@ -1,0 +1,85 @@
+Initialize engine version: 5.3.5f1 (960ebf59018a)
+GfxDevice: creating device client; threaded=1
+Direct3D:
+    Version:  Direct3D 11.0 [level 11.0]
+    Renderer: NVIDIA GeForce GTX 980 Ti (ID=0x17c8)
+    Vendor:   NVIDIA
+    VRAM:     3072 MB
+Begin MonoManager ReloadAssembly
+Platform assembly: C:\Users\rafae\Documents\GitHub\Ravatar Template\Ravatar basic_Data\Managed\UnityEngine.dll (this message is harmless)
+Loading C:\Users\rafae\Documents\GitHub\Ravatar Template\Ravatar basic_Data\Managed\UnityEngine.dll into Unity Child Domain
+Platform assembly: C:\Users\rafae\Documents\GitHub\Ravatar Template\Ravatar basic_Data\Managed\Assembly-CSharp-firstpass.dll (this message is harmless)
+Loading C:\Users\rafae\Documents\GitHub\Ravatar Template\Ravatar basic_Data\Managed\Assembly-CSharp-firstpass.dll into Unity Child Domain
+Platform assembly: C:\Users\rafae\Documents\GitHub\Ravatar Template\Ravatar basic_Data\Managed\Assembly-CSharp.dll (this message is harmless)
+Loading C:\Users\rafae\Documents\GitHub\Ravatar Template\Ravatar basic_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
+Platform assembly: C:\Users\rafae\Documents\GitHub\Ravatar Template\Ravatar basic_Data\Managed\UnityEngine.UI.dll (this message is harmless)
+Loading C:\Users\rafae\Documents\GitHub\Ravatar Template\Ravatar basic_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
+Platform assembly: C:\Users\rafae\Documents\GitHub\Ravatar Template\Ravatar basic_Data\Managed\UnityEngine.Networking.dll (this message is harmless)
+Loading C:\Users\rafae\Documents\GitHub\Ravatar Template\Ravatar basic_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
+- Completed reload, in  0.040 seconds
+Platform assembly: C:\Users\rafae\Documents\GitHub\Ravatar Template\Ravatar basic_Data\Managed\System.Core.dll (this message is harmless)
+Platform assembly: C:\Users\rafae\Documents\GitHub\Ravatar Template\Ravatar basic_Data\Managed\System.dll (this message is harmless)
+desktop: 1920x1080 60Hz; virtual: 1920x1080 at 0,0
+<RI> Initializing input.
+<RI> Input initialized.
+<RI> Initialized touch support.
+UnloadTime: 0.471436 ms
+Hello Tracker
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebugBindings.gen.cpp Line: 37)
+
+[UDPListener] Receiving in port: 55555
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebugBindings.gen.cpp Line: 37)
+
+Sent request to port33333 with content AvatarMessage$146.193.224.228#1#55555
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebugBindings.gen.cpp Line: 37)
+
+Got Calibration Message! 
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebugBindings.gen.cpp Line: 37)
+
+DynamicHeapAllocator allocation probe 1 failed - Could not get memory for large allocation 518016.
+DynamicHeapAllocator allocation probe 2 failed - Could not get memory for large allocation 518016.
+DynamicHeapAllocator allocation probe 3 failed - Could not get memory for large allocation 518016.
+DynamicHeapAllocator allocation probe 4 failed - Could not get memory for large allocation 518016.
+DynamicHeapAllocator out of memory - Could not get memory for large allocation 518016!
+Could not allocate memory: System out of memory!
+Trying to allocate: 518016B with 32 alignment. MemoryLabel: VertexData
+Allocation happend at: Line:91 in 
+Memory overview
+
+[ ALLOC_DEFAULT ] used: 25965264B | peak: 0B | reserved: 32505856B 
+[ ALLOC_TEMP_JOB ] used: 0B | peak: 0B | reserved: 2097152B 
+[ ALLOC_GFX ] used: 3415785848B | peak: 0B | reserved: 3776046920B 
+[ ALLOC_CACHEOBJECTS ] used: 172368B | peak: 0B | reserved: 10485760B 
+[ ALLOC_TYPETREE ] used: 0B | peak: 0B | reserved: 0B 
+[ ALLOC_PROFILER ] used: 0B | peak: 0B | reserved: 0B 
+[ ALLOC_TEMP_THREAD ] used: 30736B | peak: 0B | reserved: 2818048B 
+Could not allocate memory: System out of memory!
+Trying to allocate: 518016B with 32 alignment. MemoryLabel: VertexData
+Allocation happend at: Line:91 in 
+Memory overview
+
+[ ALLOC_DEFAULT ] used: 25965264B | peak: 0B | reserved: 32505856B 
+[ ALLOC_TEMP_JOB ] used: 0B | peak: 0B | reserved: 2097152B 
+[ ALLOC_GFX ] used: 3415785848B | peak: 0B | reserved: 3776046920B 
+[ ALLOC_CACHEOBJECTS ] used: 172368B | peak: 0B | reserved: 10485760B 
+[ ALLOC_TYPETREE ] used: 0B | peak: 0B | reserved: 0B 
+[ ALLOC_PROFILER ] used: 0B | peak: 0B | reserved: 0B 
+[ ALLOC_TEMP_THREAD ] used: 30736B | peak: 0B | reserved: 2818048B 
+
+ 
+(Filename:  Line: 1033)
+
+Crash!!!
+  ERROR: Error while initializing dbghelp.dll, GetLastError: 'The operation completed successfully.' (Address: 00000000)
+
+========== OUTPUTING STACK TRACE ==================
+
+  ERROR: Error while initializing dbghelp.dll, GetLastError: 'The operation completed successfully.' (Address: 00000000)
+
+========== END OF STACKTRACE ===========
+
+**** Crash! ****
