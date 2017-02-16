@@ -3,22 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
-public class Point3DRGB {
-	public Vector3 point;
-	public Color color;
-	
-	public Point3DRGB(Vector3 point, Color color){
-		this.point = point;
-		this.color = color;
-	}
-}
+
+
 
 public class PointCloudSimple : MonoBehaviour {
     Mesh[] highres_cloud;
     Mesh[] lowres_cloud;
     int highres_nclouds = 0;
     int lowres_nclouds = 0;
-    int id;
+    uint id;
 
     List<Vector3> pointsH;
     List<int> indH;
@@ -34,7 +27,49 @@ public class PointCloudSimple : MonoBehaviour {
     Vector3[] posBucket;
     Color[] colBucket;
     byte[] buffer;
-  
+
+
+    void readFileWithColor(string f)
+    {
+        FileStream fs = new FileStream(f, FileMode.Open);
+        StreamReader sr = new StreamReader(fs);
+
+        List<byte> pts = new List<byte>();
+
+        string line = "";
+        int i = 0;
+        Mesh m = new Mesh();
+        while (!sr.EndOfStream)
+        {
+            line = sr.ReadLine();
+            line = line.Replace(",", ".");
+            char[] sep = { ' ' };
+            string[] lin = line.Split(sep);
+
+            float x = float.Parse(lin[0]);
+            float y = float.Parse(lin[1]);
+            float z = float.Parse(lin[2]);
+
+            byte[] xb = System.BitConverter.GetBytes(x);
+            byte[] yb = System.BitConverter.GetBytes(y);
+            byte[] zb = System.BitConverter.GetBytes(z);
+
+            byte r = byte.Parse(lin[5]);
+            byte g = byte.Parse(lin[6]);
+            byte b = byte.Parse(lin[7]);
+            i++;
+            pts.AddRange(xb);
+            pts.AddRange(yb);
+            pts.AddRange(zb);
+            pts.Add(r);
+            pts.Add(g);
+            pts.Add(b);
+            pts.Add(1);
+        }
+
+        setPoints(pts.ToArray(), 0, ++id,i);
+        setToView();
+    }
 
     [StructLayout(LayoutKind.Explicit)]
     struct UnionArray
@@ -47,14 +82,9 @@ public class PointCloudSimple : MonoBehaviour {
 
     }
     int countPack = 0;
-    public void setPoints(byte[] receivedBytes, int step,int newid){
+    public void setPoints(byte[] receivedBytes, int step, uint newid,int size){
 
-        //pointsH.Clear();
-        //colorsH.Clear();
-        //indH.Clear();
-        //pointsL.Clear();
-        //indL.Clear();
-        //colorsL.Clear();
+      
 
         pointsH = new List<Vector3>();
         colorsH = new List<Color>();
@@ -62,16 +92,10 @@ public class PointCloudSimple : MonoBehaviour {
         pointsL = new List<Vector3>();
         indL = new List<int>();
         colorsL = new List<Color>();
- 
         UnionArray rec = new UnionArray { Bytes = receivedBytes };
      
         if (newid > id) {
             id = newid;
-
-            //for(int a = 0; a < 4; a++) {
-            //    lowres_cloud[a].Clear();
-            //    highres_cloud[a].Clear();
-            //}
 
             for (int a = 0; a < 4; a++)
             {
@@ -108,47 +132,29 @@ public class PointCloudSimple : MonoBehaviour {
 
         float x, y, z;
         byte r, g, b;
-        
-        for (int i = step; i < receivedBytes.Length; i += 16) // Each point is represented by 16 bytes.
+
+        for (int i = step; i < size; i += 16) // Each point is represented by 16 bytes.
         {
             try
             {
                 if (i + 15 > receivedBytes.Length) break; // Insurance.
-                int floatindex = (int) (i / 4.0);
+                int floatindex = (int)(i / 4.0);
                 x = rec.Floats[floatindex];
                 y = rec.Floats[floatindex + 1];
                 z = rec.Floats[floatindex + 2];
-                //buffer[0] = receivedBytes[i];
-                //buffer[1] = receivedBytes[i + 1];
-                //buffer[2] = receivedBytes[i + 2];
-                //buffer[3] = receivedBytes[i + 3];
-                //x = System.BitConverter.ToSingle(buffer, 0); // x
-
-                //buffer[0] = receivedBytes[i + 4];
-                //buffer[1] = receivedBytes[i + 5];
-                //buffer[2] = receivedBytes[i + 6];
-                //buffer[3] = receivedBytes[i + 7];
-                //y = System.BitConverter.ToSingle(buffer, 0); // y
-
-                //buffer[0] = receivedBytes[i + 8];
-                //buffer[1] = receivedBytes[i + 9];
-                //buffer[2] = receivedBytes[i + 10];
-                //buffer[3] = receivedBytes[i + 11];
-                //z = System.BitConverter.ToSingle(buffer, 0); // z
 
                 r = receivedBytes[i + 12]; // r
                 g = receivedBytes[i + 13]; // g
                 b = receivedBytes[i + 14]; // b
 
-                //   Point3DRGB pt = new Point3DRGB(new Vector3(x, y, z), new Color((float)r / 255, (float)g / 255, (float)b / 255));
                 Vector3 pos = posBucket[pointCount];
-                pos.Set(x,y,z);
+                pos.Set(x, y, z);
                 Color c = colBucket[pointCount++];
                 c.r = (float)r / 255;
                 c.g = (float)g / 255;
                 c.b = (float)b / 255;
 
-                 if (receivedBytes[i + 15] == 1)// If it's a HR point, save it to the high resolution points.
+                if (receivedBytes[i + 15] == 1)// If it's a HR point, save it to the high resolution points.
                 {
                     pointsH.Add(pos);
                     colorsH.Add(c);
@@ -161,20 +167,17 @@ public class PointCloudSimple : MonoBehaviour {
                     indL.Add(l++);
                 }
 
-                if(h == 65000)
+                if (h == 65000)
                 {
                     highres_cloud[highres_nclouds].vertices = pointsH.ToArray();
                     highres_cloud[highres_nclouds].colors = colorsH.ToArray();
                     highres_cloud[highres_nclouds].SetIndices(indH.ToArray(), MeshTopology.Points, 0);
 
                     h = 0;
-                    //pointsH.Clear();
-                    //colorsH.Clear();
-                    //indH.Clear();
                     pointsH = new List<Vector3>();
                     colorsH = new List<Color>();
                     indH = new List<int>();
-                    highres_nclouds++; 
+                    highres_nclouds++;
                 }
 
                 if (l == 65000)
@@ -184,10 +187,6 @@ public class PointCloudSimple : MonoBehaviour {
                     lowres_cloud[lowres_nclouds].SetIndices(indL.ToArray(), MeshTopology.Points, 0);
 
                     l = 0;
-                    //pointsL.Clear();
-                    //colorsL.Clear();
-                    //indL.Clear();
-                  
                     pointsL = new List<Vector3>();
                     indL = new List<int>();
                     colorsL = new List<Color>();

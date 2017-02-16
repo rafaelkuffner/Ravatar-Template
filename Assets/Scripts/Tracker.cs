@@ -43,7 +43,7 @@ public class Tracker : MonoBehaviour
        
 
         string KinectId = pdu[0]; 
-        int  id = int.Parse(pdu[1]);
+        uint  id = uint.Parse(pdu[1]);
         step += pdu[0].Length + pdu[1].Length;
 
         if (_clouds.ContainsKey(KinectId))
@@ -52,13 +52,25 @@ public class Tracker : MonoBehaviour
                 _clouds[KinectId].setToView();
             }
             else
-                _clouds[KinectId].setPoints(cloud.receivedBytes,step,id);
+                _clouds[KinectId].setPoints(cloud.receivedBytes,step,id,cloud.receivedBytes.Length);
         }
     }
-    
-    
 
-	private void _loadConfig ()
+    //FOR TCP
+    internal void setNewCloud(string KinectID, byte[] data,int size)
+    {
+     
+         // tirar o id da mensagem que é um int
+        if (_clouds.ContainsKey(KinectID))
+        {
+            byte[] idb = { data[0], data[1], data[2], data[3] };
+            uint id = BitConverter.ToUInt32(idb, 0);
+            _clouds[KinectID].setPoints(data, 4, id,size);
+            _clouds[KinectID].setToView();
+        }
+    }
+
+    private void _loadConfig ()
 	{
 		string filePath = Application.dataPath + "/" + TrackerProperties.Instance.configFilename;
 
