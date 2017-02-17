@@ -60,21 +60,20 @@ public class UdpListener : MonoBehaviour {
 
     void Update()
     {
+  
         while (_stringsToParse.Count > 0)
         {
-           
             try
             {
                 byte[] toProcess = _stringsToParse.First();
                 if(toProcess != null)
                 {
                     // TMA: THe first char distinguishes between a BodyMessage and a CloudMessage
-                  if(Convert.ToChar(toProcess[0]) == 'C')
+                    if (Convert.ToChar(toProcess[0]) == 'C')
                     {
-                      
                         string stringToParse = Encoding.ASCII.GetString(toProcess);
                         string[] splitmsg = stringToParse.Split(MessageSeparators.L0);
-                        message.set(splitmsg[1], toProcess,splitmsg[0].Length);
+                        message.set(splitmsg[1], toProcess, splitmsg[0].Length);
                         gameObject.GetComponent<Tracker>().setNewCloud(message);
                     }
                     else if (Convert.ToChar(toProcess[0]) == 'A')
