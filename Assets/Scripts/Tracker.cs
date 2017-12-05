@@ -11,14 +11,14 @@ using System.Text;
 public class Tracker : MonoBehaviour
 {
 
-	private Dictionary<string, PointCloudSimple> _clouds;
+	private Dictionary<string, PointCloudDepth> _clouds;
     private Dictionary<string, GameObject> _cloudGameObjects;
 
 
     void Awake ()
 	{
         Debug.Log("Hello Tracker");
-		_clouds = new Dictionary<string, PointCloudSimple> ();
+		_clouds = new Dictionary<string, PointCloudDepth> ();
         _cloudGameObjects = new Dictionary<string, GameObject>();
         _loadConfig ();
 
@@ -31,40 +31,16 @@ public class Tracker : MonoBehaviour
     }
     
 
-	internal void setNewCloud (CloudMessage cloud)
-	{
-        //if (!_clouds.ContainsKey (cloud.KinectId)) {
-        //	Vector3 position = new Vector3 (Mathf.Ceil (_clouds.Count / 2.0f) * (_clouds.Count % 2 == 0 ? -1.0f : 1.0f), 1, 0);
-        //          //criar nova cloud
-        //          _clouds[cloud.KinectId] = new PointCloudSimple ();
-        //}
-        int step = cloud.headerSize+3; // TMA: Size in bytes of heading: "CloudMessage" + L0 + 2 * L1. Check the UDPListener.cs from the Client.
-        string[] pdu = cloud.message.Split(MessageSeparators.L1);
-       
 
-        string KinectId = pdu[0]; 
-        uint  id = uint.Parse(pdu[1]);
-        step += pdu[0].Length + pdu[1].Length;
-
-        if (_clouds.ContainsKey(KinectId))
-        {
-            if (pdu[2] == "") {
-                _clouds[KinectId].setToView();
-            }
-            else
-                _clouds[KinectId].setPoints(cloud.receivedBytes,step,id,cloud.receivedBytes.Length);
-        }
-    }
-
-    //FOR TCP
-    internal void setNewCloud(string KinectID, byte[] data,int size, uint id)
+    //FOR TCP DEPTH
+    internal void setNewDepthCloud(string KinectID, byte[] colorData, byte[] depthData, uint id,bool compressed)
     {
-     
-         // tirar o id da mensagem que é um int
+       
+        // tirar o id da mensagem que é um int
         if (_clouds.ContainsKey(KinectID))
         {
-            _clouds[KinectID].setPoints(data, 0, id,size);
-            _clouds[KinectID].setToView();
+            _clouds[KinectID].setPoints(colorData,depthData,compressed);
+            _clouds[KinectID].show();
         }
     }
 
@@ -92,8 +68,8 @@ public class Tracker : MonoBehaviour
 
 	public void hideAllClouds ()
 	{
-		foreach (PointCloudSimple s in _clouds.Values) {
-			s.hideFromView ();
+		foreach (PointCloudDepth s in _clouds.Values) {
+			s.hide ();
 		}
 		UdpClient udp = new UdpClient ();
 		string message = CloudMessage.createRequestMessage (2,Network.player.ipAddress, TrackerProperties.Instance.listenPort); 
@@ -129,8 +105,8 @@ public class Tracker : MonoBehaviour
             cloudobj.transform.localPosition = new Vector3(px,py,pz);
             cloudobj.transform.localRotation = new Quaternion(rx,ry,rz,rw);
             cloudobj.transform.localScale = new Vector3(-1, 1, 1);
-            cloudobj.AddComponent<PointCloudSimple>();
-            PointCloudSimple cloud = cloudobj.GetComponent<PointCloudSimple>();
+            cloudobj.AddComponent<PointCloudDepth>();
+            PointCloudDepth cloud = cloudobj.GetComponent<PointCloudDepth>();
             _clouds.Add(id, cloud);
             _cloudGameObjects.Add(id, cloudobj);
 

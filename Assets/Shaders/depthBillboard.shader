@@ -3,11 +3,13 @@
 // Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
 // Upgrade NOTE: replaced '_World2Object' with 'unity_WorldToObject'
 
-Shader "Custom/Simple Billboard"
+Shader "Custom/Depth Billboard"
 {
 	Properties 
 	{
 		_Size ("Size", Range(0, 3)) = 0.03 //patch size
+		_ColorTex ("Texture", 2D) = "white" {}
+		_DepthTex ("TextureD", 2D) = "white" {}
 
 		_Dev ("Dev", Range(-5, 5)) = 0
 		_Gamma ("Gamma", Range(0, 6)) =3.41
@@ -22,7 +24,6 @@ Shader "Custom/Simple Billboard"
 		Pass
 		{
 			Tags { "RenderType"="Transparent" }
-			LOD 200
 			
 			Cull Off // render both back and front faces
 
@@ -39,8 +40,6 @@ Shader "Custom/Simple Billboard"
 				struct GS_INPUT
 				{
 					float4	pos		: POSITION;
-					float3	normal	: NORMAL;
-					float2  tex0	: TEXCOORD0;
 					float4 color	: COLOR;
 				};
 
@@ -57,9 +56,9 @@ Shader "Custom/Simple Billboard"
 				// **************************************************************
 
 				float _Size;
-				float4x4 _VP;
-				Texture2D _SpriteTex;
-				SamplerState sampler_SpriteTex;
+				sampler2D _ColorTex;				
+				sampler2D _DepthTex; 
+
 				float4 _Color; 
 
 				// **************************************************************
@@ -71,10 +70,29 @@ Shader "Custom/Simple Billboard"
 				{
 					GS_INPUT output = (GS_INPUT)0;
 
-					output.pos =  v.vertex;
-					output.normal = v.normal;
-					output.tex0 = float2(0, 0);
-					output.color = v.color;
+						float4 c = tex2Dlod(_ColorTex,float4(v.vertex.x,v.vertex.y,0,0));
+						float4 d = tex2Dlod(_DepthTex,float4(v.vertex.x,v.vertex.y,0,0));
+						int dr = d.r*255;
+						int dg = d.g*255;
+						int db = d.b*255;
+						int da = d.a*255;
+						int dValue = (int)(db | (dg << 0x8) | (dr << 0x10) | (da << 0x18));
+						float4 pos;
+						//if(c.a == 0)
+						//dValue = 2000;
+						pos.z = dValue / 1000.0;
+						int x = 512*v.vertex.x;
+						int y = 424*v.vertex.y;
+						float vertx = float(x);
+						float verty = float(424 -y);
+						pos.x =  pos.z*(vertx- 255.5)/351.001462;
+						pos.y =  pos.z*(verty-  211.5)/351.001462;
+						pos.w = 1;	
+
+						if(dValue == 0)		
+							c.a = 0;
+					output.pos =  pos;
+					output.color = c;
 
 					return output;
 				}
@@ -102,38 +120,40 @@ Shader "Custom/Simple Billboard"
 					//float3 right = cross(up, look);
 					
 					
-					//float size = (p[0].pos.z*_Size)/351.00146192  ;
-					float size = 0.014;
+					float size = (p[0].pos.z*_Size)/351.00146192  ;
+					//float size = 0.014;
 					float halfS = 0.5f * size;
 
+					if(p[0].color.a != 0){
 							
-					float4 v[4];
-					v[0] = float4(p[0].pos + halfS * right - halfS * up, 1.0f);
-					v[1] = float4(p[0].pos + halfS * right + halfS * up, 1.0f);
-					v[2] = float4(p[0].pos - halfS * right - halfS * up, 1.0f);
-					v[3] = float4(p[0].pos - halfS * right + halfS * up, 1.0f);
+						float4 v[4];
+						v[0] = float4(p[0].pos + halfS * right - halfS * up, 1.0f);
+						v[1] = float4(p[0].pos + halfS * right + halfS * up, 1.0f);
+						v[2] = float4(p[0].pos - halfS * right - halfS * up, 1.0f);
+						v[3] = float4(p[0].pos - halfS * right + halfS * up, 1.0f);
 
-					//float4 vp = UnityObjectToClipPos(unity_WorldToObject);
-					FS_INPUT pIn;
-					pIn.pos = UnityObjectToClipPos(v[0]);
-					pIn.tex0 = float2(1.0f, 0.0f);
-					pIn.color = p[0].color;
-					triStream.Append(pIn);
+						//float4 vp = UnityObjectToClipPos(unity_WorldToObject);
+						FS_INPUT pIn;
+						pIn.pos = UnityObjectToClipPos(v[0]);
+						pIn.tex0 = float2(1.0f, 0.0f);
+						pIn.color = p[0].color;
+						triStream.Append(pIn);
 
-					pIn.pos = UnityObjectToClipPos(v[1]);
-					pIn.tex0 = float2(1.0f, 1.0f);
-					pIn.color = p[0].color;
-					triStream.Append(pIn);
+						pIn.pos = UnityObjectToClipPos(v[1]);
+						pIn.tex0 = float2(1.0f, 1.0f);
+						pIn.color = p[0].color;
+						triStream.Append(pIn);
 
-					pIn.pos = UnityObjectToClipPos(v[2]);
-					pIn.tex0 = float2(0.0f, 0.0f);
-					pIn.color = p[0].color;
-					triStream.Append(pIn);
+						pIn.pos = UnityObjectToClipPos(v[2]);
+						pIn.tex0 = float2(0.0f, 0.0f);
+						pIn.color = p[0].color;
+						triStream.Append(pIn);
 
-					pIn.pos = UnityObjectToClipPos(v[3]);
-					pIn.tex0 = float2(0.0f, 1.0f);
-					pIn.color = p[0].color;
-					triStream.Append(pIn);
+						pIn.pos = UnityObjectToClipPos(v[3]);
+						pIn.tex0 = float2(0.0f, 1.0f);
+						pIn.color = p[0].color;
+						triStream.Append(pIn);
+					}
 				}
 
 				float theta1;
