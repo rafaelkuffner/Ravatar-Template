@@ -87,6 +87,7 @@
     <Compile Include="Assets\Scripts\AvatarMessage.cs" />
     <Compile Include="Assets\Scripts\CloudMessage.cs" />
     <Compile Include="Assets\Scripts\ConfigProperties.cs" />
+    <Compile Include="Assets\Scripts\Decompressor.cs" />
     <Compile Include="Assets\Scripts\MouseOrbitImproved.cs" />
     <Compile Include="Assets\Scripts\MoveCamera.cs" />
     <Compile Include="Assets\Scripts\PointCloudDepth.cs" />
